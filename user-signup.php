@@ -14,14 +14,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
     $confirm_password = $_POST['confirm_password'] ?? '';
 
     if ($name === '' || $email === '' || $password === '') {
-        $error = "All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email address.";
-    } elseif (strlen($password) < 6) {
-        $error = "Password must be at least 6 characters.";
-    } elseif ($password !== $confirm_password) {
-        $error = "Passwords do not match.";
-    } else {
+    $error = "All fields are required.";
+} 
+elseif (!preg_match("/^[a-zA-Z\s]+$/", $name)) {
+    $error = "Full name should contain only letters and spaces.";
+}
+elseif (strlen($name) < 3) {
+    $error = "Full name must be at least 3 characters long.";
+}
+elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $error = "Invalid email address.";
+}
+elseif (strlen($password) < 6) {
+    $error = "Password must be at least 6 characters.";
+}
+elseif ($password !== $confirm_password) {
+    $error = "Passwords do not match.";
+}else {
         if (!$conn) {
             $error = "Database connection error.";
         } else {
@@ -103,4 +112,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signup'])) {
     </form>
 </div>
 </body>
+
 </html>
