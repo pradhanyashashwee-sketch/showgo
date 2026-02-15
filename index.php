@@ -15,7 +15,7 @@
           <li><a href="index.php">Home</a></li>
           <li><a href="booking.php">Movies</a></li>
           <li><a href="ticket_rates.php">Ticket Rate</a></li>
-          <li><a href="user-login.php">Login</a></li>
+          <!-- <li><a href="user-login.php">Login</a></li> -->
           <li><a href="admin-login.php">Admin</a></li> 
         </ul>
       </nav>
@@ -135,4 +135,5 @@
 </body>
 <script src="slider.js"></script>
 <script src="popup.js"></script>  
+
 </html>
