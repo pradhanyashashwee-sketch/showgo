@@ -1,0 +1,701 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+body {
+  background: #80a1ba;
+  color: #8b99bb;
+  overflow-x: hidden;
+}
+header {
+  width: 100%;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #4a628a;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+}
+.logo {
+  font-size: 20px;
+  color: whitesmoke;
+  font-weight: bold;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+}
+nav ul li a:hover {
+  color: #18053c;
+}
+.role-container {
+  text-align: center;
+  margin-top: 120px;
+}
+.role-title {
+  font-size: 40px;
+  color: #50819a;
+  margin-bottom: 40px;
+}
+.role-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+.role-btn {
+  display: inline-block;
+  padding: 15px 45px;
+  background: #486b7c;
+  color: rgb(73, 46, 180);
+  font-size: 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+.role-btn:hover {
+  background: #427d9b;
+  color: white;
+}
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+.login-box {
+  width: 420px;
+  background: #a489d4;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+.login-box p{
+  color:black;
+}
+.login-title {
+  color: #35053f;
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 25px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: black;
+}
+input {
+  width: 100%;
+  padding: 12px;
+  background: #372a3e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  color: white;
+}
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: #26172e;
+  color: white;
+  border: none;
+  font-size: 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.login-btn:hover {
+  background: #8551a1;
+}
+.signup-text {
+  text-align: center;
+  margin-top: 15px;
+  color: #35053f;
+}
+.signup-text a {
+  color: #35053f;
+  text-decoration: none;
+}
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 450px;
+  overflow: hidden;
+  background: #000;
+}
+.slider {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.slide {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 3s ease-in-out;
+}
+.slide.active {
+  opacity: 1;
+}
+.slide-content {
+  position: absolute;
+  bottom: 50px;
+  left: 50px;
+  color: #fff;
+}
+.tag {
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-weight: bold;
+  color: white;
+}
+.slide-content h1 {
+  font-size: 50px;
+  margin: 10px 0;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+}
+.btn {
+  display: inline-block;
+  padding: 12px 25px;
+  background: #53629e;
+  color: #ffffff;
+  font-size: x-large;
+  text-decoration: none;
+  border-radius: 15px;
+  margin-top: 20px;
+  font-weight: bold;
+}
+.arrow {
+  position: absolute;
+  top: 50%;
+  font-size: 40px;
+  color: #fff;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 10;
+}
+.prev {
+  left: 20px;
+}
+.next {
+  right: 20px;
+}
+.dots {
+  position: absolute;
+  bottom: 15px;
+  width: 100%;
+  text-align: center;
+}
+.dot {
+  height: 12px;
+  width: 12px;
+  margin: 0 5px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #777;
+  cursor: pointer;
+}
+.active-dot {
+  background: #fff;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 25px;
+  font-size: 28px;
+  color: #0c2b4e;
+  font-family: "Helvetica Neue", sans-serif;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5); 
+    background-color: rgba(0,0,0,0.8); 
+}
+.modal-content {
+    background-color: transparent;
+    margin: 10% auto; 
+    padding: 20px;
+    border: none;
+    width: fit-content;
+    max-width: 90%;
+    position: relative;
+    border-radius: 10;
+}
+.popup-image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.close-btn {
+    color:white;
+    font-size: 40px;
+    font-weight: bold;
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    z-index: 1001;
+}
+.close-btn:hover,
+.close-btn:focus {
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
+}
+.movies-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px;
+  background-color: #79a1c1;
+}
+.movies-card {
+  background-color: #e8f5e9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 300px;
+  max-width: 30%;
+  margin-bottom: 20px;
+}
+.posters {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+.posters img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+.movies-card h3 {
+  text-align: left;
+  padding: 10px 15px 5px;
+  margin: 0;
+  font-size: 18px;
+  color: #0c0c65;
+}
+.movies-card p {
+  text-align: left;
+  padding: 0 15px 10px;
+  margin: 0;
+  font-size: 14px;
+  color: #4a4a4a;
+}
+.buttons {
+  padding: 3px 15px 15px;
+}
+.timings {
+  display: flex;
+  gap: 8px;
+}
+.timebutton1,
+.timebutton2,
+.timebutton3 {
+  display: block;
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+.timebutton1 {
+  background: #334488;
+}
+.timebutton2 {
+  background: #194680;
+}
+.timebutton3 {
+  background: #123478;
+}
+.timebutton1:hover,
+.timebutton2:hover,
+.timebutton3:hover {
+  background-color: #a8d2e2;
+  color: #000;
+}
+.coming-container {
+  width: 75%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  padding-bottom: 40px;
+}
+.coming-card {
+  background: #dff2eb;
+  color: #4b164c;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  transition: 0.3s;
+}
+.coming-card:hover {
+  transform: scale(1.05);
+}
+h2 {
+  text-align: center;
+  color: #0c0c65;
+  margin-top: 30px;
+}
+.coming-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px;
+  background-color: #79a1c1;
+}
+.coming-card {
+  display: flex;
+  background-color: #e8f5e9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 450px;
+  max-width: 90%;
+  margin-bottom: 20px;
+}
+.poster {
+  width: 150px;
+  height: 220px;
+  overflow: hidden;
+}
+.poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+}
+.desc {
+  flex-grow: 1;
+  padding: 15px;
+  text-align: left;
+}
+.desc h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #0c0c65;
+}
+.desc p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #160b0b;
+}
+.movie-card {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f5f5f5;
+}
+.poster {
+  width: 30%;
+  height: auto;
+  min-width: 150px;
+  background: none;
+  border-radius: 10px;
+  margin-right: 15px;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+.poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  vertical-align: top;
+  border-radius: 10px;
+}
+.movies-card .posters a {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.movies-card .posters a:hover {
+  transform: scale(1.02);
+}
+
+.movies-card .posters img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.movie-details{
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    background-color: #fff;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Poster section on the left */
+.movie_poster {
+    flex: 0 0 300px;
+}
+
+.movie_poster img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Movie info section on the right */
+.movie-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Movie title */
+.movie-info h2 {
+    color: #333;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+    border-bottom: 3px solid #ff4757;
+    padding-bottom: 10px;
+}
+
+/* Movie description - black text */
+.movie-info p {
+    color: #000; /* Black color for description */
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    text-align: justify;
+}
+
+/* Available Timings heading */
+.movie-info h3 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+.details {
+  flex-grow: 1;
+  padding: 0;
+}
+.details h3 {
+  text-align: left;
+  margin-left: 0;
+  font-size: 18px;
+  color: #0c0c65;
+  font-family: "Rubik", sans-serif;
+  margin-top: 15px;
+}
+.details p {
+  color: black;
+}
+.time-btn1,
+.time-btn2,
+.time-btn3 {
+  display: block;
+  padding: 5px 10px;
+  font-size: 16px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+.time-btn1 {
+  background: #2a2ea1;
+}
+.time-btn2 {
+  background: #0c12c3;
+}
+.time-btn3 {
+  background: #070d7d;
+}
+.time-btn1:hover {
+  background: #a8d2e2;
+}
+.time-btn2:hover {
+  background: #a3d3e6;
+}
+.time-btn3:hover {
+  background: #9fddf5;
+}
+.price-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.price-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 28px;
+  color: #074799;
+}
+.price-table {
+  height: 25%;
+  width: 100%;
+  border-collapse: collapse;
+  background: #4a628a;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.price-table th {
+  background: #374967;
+  color: #fff;
+  padding: 14px;
+  text-align: left;
+  font-size: 26px;
+}
+.price-table td {
+  padding: 14px;
+  border-bottom: 0 solid #ddd;
+  font-size: 12px;
+  color: #001318;
+}
+.price-table tr:nth-child(even) {
+  background: #f7f7f7;
+}
+.price-table tr:hover {
+  background: #7690d2;
+  color: #fff;
+}
+.price-table td[colspan="2"] {
+  font-weight: bold;
+}
+.price-table small {
+  font-size: 10px;
+  color: #575454;
+}
+
+/* Seat Booking Layout */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.col-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+    padding: 0 15px;
+}
+
+.col-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+    padding: 0 15px;
+}
+
+/* Alert styles */
+.alert {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 10px;
+    width: 500px;
+    max-width: 90%;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .col-8, .col-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .booking-summary {
+        margin-top: 30px;
+    }
+}
+footer {
+  text-align: center;
+  padding: 16px;
+  background: #4a628a;
+  color: whitesmoke;
+  margin-top: 22px;
+}
