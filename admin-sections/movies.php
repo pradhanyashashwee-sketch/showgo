@@ -17,6 +17,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $release_date = $conn->real_escape_string($_POST['release_date']);
         $status = $conn->real_escape_string($_POST['status']);
         
+        // ========== BACKEND VALIDATION ==========
+        $errors = [];
+        
+        // Check if release date is empty for now_showing or coming_soon
+        if (empty($release_date) && in_array($status, ['now_showing', 'coming_soon'])) {
+            $errors[] = "Release date is required for '" . ucfirst(str_replace('_', ' ', $status)) . "' movies";
+        }
+        
+        // Check if trying to set now_showing with future date
+        if (!empty($release_date) && $status === 'now_showing') {
+            $today = date('Y-m-d');
+            if ($release_date > $today) {
+                $errors[] = "Cannot set 'Now Showing' for a future release date";
+            }
+        }
+        
+        if (!empty($errors)) {
+            $_SESSION['error'] = implode("<br>", $errors);
+            header("Location: admin_dashboard.php?tab=movies&edit=$id");
+            exit();
+        }
+        
         // Handle file upload
         $poster_url = $edit_movie['poster_url']; // Keep existing poster by default
         
@@ -43,14 +65,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        $sql = "UPDATE movies SET 
-                title='$title', 
-                description='$description', 
-                duration_minutes=$duration, 
-                poster_url='$poster_url', 
-                release_date='$release_date', 
-                status='$status' 
-                WHERE id=$id";
+        // Handle NULL for empty release_date
+        if (empty($release_date)) {
+            $sql = "UPDATE movies SET 
+                    title='$title', 
+                    description='$description', 
+                    duration_minutes=$duration, 
+                    poster_url='$poster_url', 
+                    release_date=NULL, 
+                    status='$status' 
+                    WHERE id=$id";
+        } else {
+            $sql = "UPDATE movies SET 
+                    title='$title', 
+                    description='$description', 
+                    duration_minutes=$duration, 
+                    poster_url='$poster_url', 
+                    release_date='$release_date', 
+                    status='$status' 
+                    WHERE id=$id";
+        }
         
         if ($conn->query($sql)) {
             $_SESSION['message'] = "Movie updated successfully!";
@@ -90,11 +124,11 @@ $movies = $conn->query($query);
 <?php if ($edit_movie): ?>
 <div class="card form-card">
     <h3>Edit Movie</h3>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="editMovieForm">
         <input type="hidden" name="id" value="<?php echo $edit_movie['id']; ?>">
         
         <div class="form-group">
-            <label for="edit_title">Movie Title </label>
+            <label for="edit_title">Movie Title *</label>
             <input type="text" id="edit_title" name="title" value="<?php echo htmlspecialchars($edit_movie['title']); ?>" required>
         </div>
         
@@ -105,12 +139,13 @@ $movies = $conn->query($query);
         
         <div class="form-row">
             <div class="form-group">
-                <label for="edit_duration">Duration (minutes) </label>
+                <label for="edit_duration">Duration (minutes) *</label>
                 <input type="number" id="edit_duration" name="duration" value="<?php echo $edit_movie['duration_minutes']; ?>" required>
             </div>
             <div class="form-group">
-                <label for="edit_release_date">Release Date</label>
+                <label for="edit_release_date">Release Date <span id="releaseRequired" style="color: red; display: none;">*</span></label>
                 <input type="date" id="edit_release_date" name="release_date" value="<?php echo $edit_movie['release_date']; ?>">
+                <small class="text-muted" id="releaseHelp">Required for "Now Showing" and "Coming Soon"</small>
             </div>
         </div>
         
@@ -129,8 +164,8 @@ $movies = $conn->query($query);
         </div>
         
         <div class="form-group">
-            <label for="edit_status">Status</label>
-            <select id="edit_status" name="status">
+            <label for="edit_status">Status *</label>
+            <select id="edit_status" name="status" required>
                 <option value="now_showing" <?php echo $edit_movie['status'] == 'now_showing' ? 'selected' : ''; ?>>Now Showing</option>
                 <option value="coming_soon" <?php echo $edit_movie['status'] == 'coming_soon' ? 'selected' : ''; ?>>Coming Soon</option>
                 <option value="archived" <?php echo $edit_movie['status'] == 'archived' ? 'selected' : ''; ?>>Archived</option>
@@ -185,18 +220,16 @@ $movies = $conn->query($query);
                 </td>
                 <td><?php echo $movie['release_date']; ?></td>
                 <td>
-        <a href="javascript:void(0)" 
-   onclick='editMovie(
-       <?php echo $movie['id']; ?>, 
-       "<?php echo addslashes($movie['title']); ?>", 
-       "<?php echo addslashes($movie['description']); ?>", 
-       <?php echo (int)($movie['duration_minutes'] ?? 0); ?>, 
-       "<?php echo $movie['release_date'] ?? ''; ?>", 
-       "<?php echo $movie['status']; ?>"
-   )' 
-   class="btn btn-sm btn-warning">
-    <i class="fas fa-edit"></i> Edit
-</a>
+                    <a onclick='editMovie(
+                        <?php echo $movie['id']; ?>, 
+                        "<?php echo addslashes($movie['title']); ?>", 
+                        "<?php echo addslashes($movie['description']); ?>", 
+                        <?php echo (int)($movie['duration_minutes'] ?? 0); ?>, 
+                        "<?php echo $movie['release_date'] ?? ''; ?>", 
+                        "<?php echo $movie['status']; ?>"
+                    )' class="btn btn-sm btn-warning" style="cursor: pointer;">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
                     <button class="btn btn-sm btn-danger ajax-delete-movie" data-id="<?php echo $movie['id']; ?>" onclick="deleteMovie(<?php echo $movie['id']; ?>)">
                         <i class="fas fa-trash"></i> Delete
                     </button>
@@ -253,9 +286,105 @@ $movies = $conn->query($query);
     font-size: 12px;
     border-radius: 3px;
 }
+
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+}
 </style>
 
 <script>
+// ============================================
+// MOVIE FORM VALIDATION
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements for edit form
+    const editReleaseDate = document.getElementById('edit_release_date');
+    const editStatus = document.getElementById('edit_status');
+    const editForm = document.getElementById('editMovieForm');
+    const releaseRequired = document.getElementById('releaseRequired');
+    const releaseHelp = document.getElementById('releaseHelp');
+    const editNowShowing = editStatus?.querySelector('option[value="now_showing"]');
+
+    // ========== UPDATE UI BASED ON STATUS AND DATE ==========
+    function updateEditForm() {
+        if (!editStatus || !editReleaseDate) return;
+        
+        const selectedStatus = editStatus.value;
+        const selectedDate = editReleaseDate.value;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Show/hide required indicator
+        if (selectedStatus === 'now_showing' || selectedStatus === 'coming_soon') {
+            if (releaseRequired) releaseRequired.style.display = 'inline';
+            if (releaseHelp) releaseHelp.style.color = '#dc3545';
+            editReleaseDate.setAttribute('required', 'required');
+        } else {
+            if (releaseRequired) releaseRequired.style.display = 'none';
+            if (releaseHelp) releaseHelp.style.color = '#6c757d';
+            editReleaseDate.removeAttribute('required');
+        }
+        
+        // Disable "Now Showing" if date is in future
+        if (editNowShowing && selectedDate) {
+            const dateObj = new Date(selectedDate);
+            if (dateObj > today) {
+                editNowShowing.disabled = true;
+                if (editStatus.value === 'now_showing') {
+                    editStatus.value = 'coming_soon';
+                }
+            } else {
+                editNowShowing.disabled = false;
+            }
+        }
+    }
+
+    // ========== FORM SUBMISSION VALIDATION ==========
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            const status = editStatus.value;
+            const releaseDate = editReleaseDate.value;
+            const errors = [];
+            
+            // Check if release date is empty for now_showing or coming_soon
+            if ((status === 'now_showing' || status === 'coming_soon') && !releaseDate) {
+                errors.push('Release date is required for "' + status.replace('_', ' ') + '" movies');
+            }
+            
+            // Check if trying to set now_showing with future date
+            if (status === 'now_showing' && releaseDate) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selectedDate = new Date(releaseDate);
+                
+                if (selectedDate > today) {
+                    errors.push('Cannot set "Now Showing" for a future release date');
+                }
+            }
+            
+            if (errors.length > 0) {
+                e.preventDefault();
+                alert('Validation Errors:\n• ' + errors.join('\n• '));
+            }
+        });
+    }
+
+    // ========== EVENT LISTENERS ==========
+    if (editStatus) {
+        editStatus.addEventListener('change', updateEditForm);
+    }
+    
+    if (editReleaseDate) {
+        editReleaseDate.addEventListener('change', updateEditForm);
+    }
+    
+    // Run once on page load
+    updateEditForm();
+});
+
 // Preview image before upload
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('edit_poster');
@@ -293,4 +422,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Edit movie function (from parent page)
+function editMovie(id, title, description, duration, releaseDate, status) {
+    if (window.opener && window.opener.editMovie) {
+        window.opener.editMovie(id, title, description, duration, releaseDate, status);
+    } else {
+        // Fallback: redirect to edit URL
+        window.location.href = 'admin_dashboard.php?tab=movies&edit=' + id;
+    }
+}
 </script>
