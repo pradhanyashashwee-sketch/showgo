@@ -143,9 +143,9 @@ $movies = $conn->query($query);
                 <input type="number" id="edit_duration" name="duration" value="<?php echo $edit_movie['duration_minutes']; ?>" required>
             </div>
             <div class="form-group">
-                <label for="edit_release_date">Release Date <span id="releaseRequired" style="color: red; display: none;">*</span></label>
+                <label for="edit_release_date">Release Date <span id="editReleaseRequired" style="color: red; display: none;">*</span></label>
                 <input type="date" id="edit_release_date" name="release_date" value="<?php echo $edit_movie['release_date']; ?>">
-                <small class="text-muted" id="releaseHelp">Required for "Now Showing" and "Coming Soon"</small>
+                <small class="text-muted" id="editReleaseHelp">Required for "Now Showing" and "Coming Soon"</small>
             </div>
         </div>
         
@@ -296,19 +296,18 @@ $movies = $conn->query($query);
 
 <script>
 // ============================================
-// MOVIE FORM VALIDATION
+// MOVIE FORM VALIDATION - BOTH ADD AND EDIT
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Elements for edit form
+    // ========== EDIT FORM VALIDATION ==========
     const editReleaseDate = document.getElementById('edit_release_date');
     const editStatus = document.getElementById('edit_status');
     const editForm = document.getElementById('editMovieForm');
-    const releaseRequired = document.getElementById('releaseRequired');
-    const releaseHelp = document.getElementById('releaseHelp');
+    const editReleaseRequired = document.getElementById('editReleaseRequired');
+    const editReleaseHelp = document.getElementById('editReleaseHelp');
     const editNowShowing = editStatus?.querySelector('option[value="now_showing"]');
 
-    // ========== UPDATE UI BASED ON STATUS AND DATE ==========
     function updateEditForm() {
         if (!editStatus || !editReleaseDate) return;
         
@@ -319,12 +318,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show/hide required indicator
         if (selectedStatus === 'now_showing' || selectedStatus === 'coming_soon') {
-            if (releaseRequired) releaseRequired.style.display = 'inline';
-            if (releaseHelp) releaseHelp.style.color = '#dc3545';
+            if (editReleaseRequired) editReleaseRequired.style.display = 'inline';
+            if (editReleaseHelp) editReleaseHelp.style.color = '#dc3545';
             editReleaseDate.setAttribute('required', 'required');
         } else {
-            if (releaseRequired) releaseRequired.style.display = 'none';
-            if (releaseHelp) releaseHelp.style.color = '#6c757d';
+            if (editReleaseRequired) editReleaseRequired.style.display = 'none';
+            if (editReleaseHelp) editReleaseHelp.style.color = '#6c757d';
             editReleaseDate.removeAttribute('required');
         }
         
@@ -342,19 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ========== FORM SUBMISSION VALIDATION ==========
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
             const status = editStatus.value;
             const releaseDate = editReleaseDate.value;
             const errors = [];
             
-            // Check if release date is empty for now_showing or coming_soon
             if ((status === 'now_showing' || status === 'coming_soon') && !releaseDate) {
                 errors.push('Release date is required for "' + status.replace('_', ' ') + '" movies');
             }
             
-            // Check if trying to set now_showing with future date
             if (status === 'now_showing' && releaseDate) {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -372,7 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ========== EVENT LISTENERS ==========
     if (editStatus) {
         editStatus.addEventListener('change', updateEditForm);
     }
@@ -381,8 +376,123 @@ document.addEventListener('DOMContentLoaded', function() {
         editReleaseDate.addEventListener('change', updateEditForm);
     }
     
-    // Run once on page load
     updateEditForm();
+
+    // ========== ADD FORM VALIDATION (MODAL) ==========
+    // These elements are in the parent page (admin_dashboard.php)
+    // We need to access them through the modal
+    
+    const addMovieBtn = document.getElementById('addMovieBtn');
+    if (addMovieBtn) {
+        addMovieBtn.addEventListener('click', function() {
+            // Small delay to ensure modal is loaded
+            setTimeout(setupAddFormValidation, 100);
+        });
+    }
+    
+    function setupAddFormValidation() {
+        const addReleaseDate = document.getElementById('release_date');
+        const addStatus = document.getElementById('status');
+        const addForm = document.getElementById('movieForm');
+        const addNowShowing = addStatus?.querySelector('option[value="now_showing"]');
+        
+        // Create required indicator if it doesn't exist
+        let addReleaseRequired = document.getElementById('addReleaseRequired');
+        let addReleaseHelp = document.querySelector('#release_date + .help-text');
+        
+        if (!addReleaseRequired && addReleaseDate) {
+            addReleaseRequired = document.createElement('span');
+            addReleaseRequired.id = 'addReleaseRequired';
+            addReleaseRequired.style.color = 'red';
+            addReleaseRequired.style.display = 'none';
+            addReleaseRequired.textContent = '*';
+            
+            const label = document.querySelector('label[for="release_date"]');
+            if (label) {
+                label.appendChild(addReleaseRequired);
+            }
+        }
+        
+        function updateAddForm() {
+            if (!addStatus || !addReleaseDate) return;
+            
+            const selectedStatus = addStatus.value;
+            const selectedDate = addReleaseDate.value;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Show/hide required indicator
+            if (selectedStatus === 'now_showing' || selectedStatus === 'coming_soon') {
+                if (addReleaseRequired) addReleaseRequired.style.display = 'inline';
+                if (addReleaseHelp) addReleaseHelp.style.color = '#dc3545';
+                addReleaseDate.setAttribute('required', 'required');
+            } else {
+                if (addReleaseRequired) addReleaseRequired.style.display = 'none';
+                if (addReleaseHelp) addReleaseHelp.style.color = '#6c757d';
+                addReleaseDate.removeAttribute('required');
+            }
+            
+            // Disable "Now Showing" if date is in future
+            if (addNowShowing && selectedDate) {
+                const dateObj = new Date(selectedDate);
+                if (dateObj > today) {
+                    addNowShowing.disabled = true;
+                    if (addStatus.value === 'now_showing') {
+                        addStatus.value = 'coming_soon';
+                    }
+                } else {
+                    addNowShowing.disabled = false;
+                }
+            }
+        }
+        
+        if (addForm) {
+            // Remove any existing listener to prevent duplicates
+            addForm.removeEventListener('submit', handleAddSubmit);
+            addForm.addEventListener('submit', handleAddSubmit);
+        }
+        
+        function handleAddSubmit(e) {
+            const status = addStatus.value;
+            const releaseDate = addReleaseDate.value;
+            const errors = [];
+            
+            if ((status === 'now_showing' || status === 'coming_soon') && !releaseDate) {
+                errors.push('Release date is required for "' + status.replace('_', ' ') + '" movies');
+            }
+            
+            if (status === 'now_showing' && releaseDate) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selectedDate = new Date(releaseDate);
+                
+                if (selectedDate > today) {
+                    errors.push('Cannot set "Now Showing" for a future release date');
+                }
+            }
+            
+            if (errors.length > 0) {
+                e.preventDefault();
+                alert('Validation Errors:\n• ' + errors.join('\n• '));
+                return false;
+            }
+        }
+        
+        if (addStatus) {
+            addStatus.removeEventListener('change', updateAddForm);
+            addStatus.addEventListener('change', updateAddForm);
+        }
+        
+        if (addReleaseDate) {
+            addReleaseDate.removeEventListener('change', updateAddForm);
+            addReleaseDate.addEventListener('change', updateAddForm);
+        }
+        
+        updateAddForm();
+    }
+    
+    // Try to setup add form validation immediately in case modal is already loaded
+    setTimeout(setupAddFormValidation, 500);
 });
 
 // Preview image before upload
