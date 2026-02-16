@@ -150,7 +150,6 @@ ORDER BY s.show_date, s.show_time;
 -- COMPLETE INSERT SCRIPT FOR SHOWGO DATABASE
 -- =============================================
 
-USE showgo_db;
 
 -- 1. INSERT ADMINS (Plain Text Passwords)
 INSERT INTO admins (full_name, email, password, created_at) VALUES
